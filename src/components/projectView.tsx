@@ -3,22 +3,24 @@ import { Project } from "../types";
 
 const ProjectContainer = styled.main`
     padding: 1rem;
-    width: 100%;
+    width: 80%;
 `
 
 const ProjectTitle = styled.h1`
     font-size: 3rem;
-    top: -1rem;
-    height: 2.5rem;
-    position: relative;
+    line-height: 1;
+    margin-bottom: 0.5rem;
 `
 
 const ProjectDeadline = styled.p`
-    
+    color: #555;
+    margin-bottom: 1rem;
 `
 
 const ProjectDescription = styled.p`
-
+    max-height: 30dvh;
+    overflow-y: scroll;
+    word-wrap: break-word;
 `
 
 export default function ProjectView({ project }: { project: Project | null }) {
