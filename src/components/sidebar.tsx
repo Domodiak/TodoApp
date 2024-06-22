@@ -112,7 +112,7 @@ export default function Sidebar({ projects, dispatchProjects, selectedProjectId,
 
         const projectName = nameInput.current.value
         const projectDescription = descriptionInput.current.value
-        const projectDeadline = new Date(deadlineInput.current.value)
+        const projectDeadline = Date.parse(deadlineInput.current.value)
 
         dispatchProjects({
             type: "CREATE_PROJECT",

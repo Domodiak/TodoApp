@@ -32,7 +32,7 @@ export default function ProjectView({ project }: { project: Project | null }) {
     return (
         <ProjectContainer>
             <ProjectTitle>{project.name}</ProjectTitle>
-            <ProjectDeadline>{project.deadline.toDateString()}</ProjectDeadline>
+            <ProjectDeadline>{new Date(project.deadline).toDateString()}</ProjectDeadline>
             <ProjectDescription>{project.description}</ProjectDescription>
         </ProjectContainer>
     )
