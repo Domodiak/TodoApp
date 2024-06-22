@@ -108,11 +108,15 @@ export default function Sidebar({ projects, dispatchProjects, selectedProjectId,
             setDeadlineError("Date is invalid")
         }
 
+        if(!descriptionInput.current) {
+            errors = true;
+        }
+
         if(errors) return;
 
-        const projectName = nameInput.current.value
-        const projectDescription = descriptionInput.current.value
-        const projectDeadline = Date.parse(deadlineInput.current.value)
+        const projectName = nameInput.current!.value
+        const projectDescription = descriptionInput.current!.value
+        const projectDeadline = Date.parse(deadlineInput.current!.value)
 
         dispatchProjects({
             type: "CREATE_PROJECT",
@@ -124,9 +128,9 @@ export default function Sidebar({ projects, dispatchProjects, selectedProjectId,
             }
         })
 
-        nameInput.current.value = "";
-        descriptionInput.current.value = "";
-        deadlineInput.current.value = "";
+        nameInput.current!.value = "";
+        descriptionInput.current!.value = "";
+        deadlineInput.current!.value = "";
 
         setNameError("")
         setDeadlineError("")

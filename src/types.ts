@@ -1,5 +1,5 @@
-export type Task = { text: String, completed: Boolean }
-export type Project = { name: String, description: String, deadline: number, tasks: Task[] }
+export type Task = { text: string, completed: boolean }
+export type Project = { name: string, description: string, deadline: number, tasks: Task[] }
 
 export type ProjectsAction =
   | { type: "CREATE_TASK"; projectIndex: number, data: Task }

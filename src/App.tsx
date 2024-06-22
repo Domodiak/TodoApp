@@ -33,7 +33,7 @@ function App() {
   return (
       <>
         <Sidebar projects={projects} dispatchProjects={dispatchProjects} selectedProjectId={selectedProjectId} setSelectedProjectId={setSelectedProjectId} />
-        <ProjectView project={selectedProjectId !== undefined ? projects[selectedProjectId] : null} />
+        <ProjectView project={selectedProjectId !== undefined ? projects[selectedProjectId] : null} projectsDispatch={dispatchProjects} projectId={selectedProjectId} />
       </>
   )
 }
