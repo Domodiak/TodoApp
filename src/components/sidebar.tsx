@@ -1,6 +1,6 @@
 import { css, styled } from "styled-components"
 import { Project, ProjectsAction } from "../types"
-import { Dispatch, MouseEventHandler, SetStateAction, useRef } from "react"
+import { Dispatch, MouseEventHandler, SetStateAction, useRef, useState } from "react"
 import Modal from "./modal"
 
 const SidebarContainer = styled.aside`
@@ -37,9 +37,16 @@ const CloseButton = styled.button`
 const ModalInput = styled.input`
     border: 1px solid gray;
     padding: 1rem;
-    border-radius: 0.3rem
+    border-radius: 0.3rem;
+    font-size: 1rem;
 `
+
+const ModalGroup = styled.div`
+    margin: 0.5rem 0 0.5rem 0;
+`
+
 const ModalTextarea = styled.textarea`
+    font-size: 1rem;
     border: 1px solid gray;
     padding: 1rem;
     border-radius: 0.3rem;
@@ -52,6 +59,11 @@ const ModalButton = styled.button`
     border: 1px solid gray;
     background-color: transparent;
     border-radius: 0.3rem;
+`
+
+const Error = styled.div`
+    color: red;
+    margin-bottom: 0.5rem;
 `
 
 type ItemProps = {
@@ -73,6 +85,8 @@ export default function Sidebar({ projects, dispatchProjects, selectedProjectId,
     const nameInput = useRef<HTMLInputElement>(null)
     const descriptionInput = useRef<HTMLTextAreaElement>(null)
     const deadlineInput = useRef<HTMLInputElement>(null)
+    const [ nameError, setNameError ] = useState<string>()
+    const [ deadlineError, setDeadlineError ] = useState<string>()
 
     const openDialog = () => {
         dialog.current && dialog.current.showModal()
@@ -83,7 +97,18 @@ export default function Sidebar({ projects, dispatchProjects, selectedProjectId,
     const createProject: MouseEventHandler<HTMLButtonElement> = (e) => {
         e.preventDefault()
 
-        if (!nameInput.current || !descriptionInput.current || !deadlineInput.current) return // TODO: Show fields with errors
+        let errors = false;
+        if (!nameInput.current || nameInput.current.value.trim().length === 0) {
+            errors = true;
+            setNameError("Name cannot be empty")
+        }
+
+        if(!deadlineInput.current || !Date.parse(deadlineInput.current.value)) {
+            errors = true;
+            setDeadlineError("Date is invalid")
+        }
+
+        if(errors) return;
 
         const projectName = nameInput.current.value
         const projectDescription = descriptionInput.current.value
@@ -103,6 +128,9 @@ export default function Sidebar({ projects, dispatchProjects, selectedProjectId,
         descriptionInput.current.value = "";
         deadlineInput.current.value = "";
 
+        setNameError("")
+        setDeadlineError("")
+
         closeDialog()
         setSelectedProjectId(projects.length)
     }
@@ -114,11 +142,20 @@ export default function Sidebar({ projects, dispatchProjects, selectedProjectId,
         <>
             <Modal ref={dialog} css={ModalCss} targetElement={document.getElementsByTagName("body")[0]}>
                 <CloseButton onClick={closeDialog}><span className="material-symbols-outlined">close</span></CloseButton>
-                <ModalInput type="text" ref={nameInput} placeholder="Project name" />
-                <ModalTextarea ref={descriptionInput} placeholder="Project description" />
-                <ModalInput type="date" ref={deadlineInput} placeholder="Project deadline" />
-
-                <ModalButton onClick={createProject}>Create</ModalButton>
+                <ModalGroup>
+                    {nameError ? <Error>{nameError}</Error> : null}
+                    <ModalInput type="text" ref={nameInput} placeholder="Project name" />
+                </ModalGroup>
+                <ModalGroup>
+                    <ModalTextarea ref={descriptionInput} placeholder="Project description" />
+                </ModalGroup>
+                <ModalGroup>
+                    {deadlineError ? <Error>{deadlineError}</Error> : null}
+                    <ModalInput type="date" ref={deadlineInput} placeholder="Project deadline" />
+                </ModalGroup>
+                <ModalGroup>
+                    <ModalButton onClick={createProject}>Create</ModalButton>
+                </ModalGroup>
             </Modal>
             <SidebarContainer>
                 {projects.map(listItem)}
