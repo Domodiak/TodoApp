@@ -14,6 +14,46 @@ const SidebarContainer = styled.aside`
     box-sizing: border-box;
 `
 
+const ModalCss = css`
+    padding: 2rem;
+    border-radius: 0.5rem;
+    border: 1px #889ae3 solid;
+    gap: 1rem;
+
+    &[open] {
+        display: flex;
+        flex-direction: column;
+    }
+`
+
+const CloseButton = styled.button`
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    aspect-ratio: 1;
+    background-color: transparent;
+`
+
+const ModalInput = styled.input`
+    border: 1px solid gray;
+    padding: 1rem;
+    border-radius: 0.3rem
+`
+const ModalTextarea = styled.textarea`
+    border: 1px solid gray;
+    padding: 1rem;
+    border-radius: 0.3rem;
+    resize: vertical;
+    max-height: 60dvh;
+`
+
+const ModalButton = styled.button`
+    padding: 1rem;
+    border: 1px solid gray;
+    background-color: transparent;
+    border-radius: 0.3rem;
+`
+
 type ItemProps = {
     selected: boolean
 }
@@ -43,7 +83,7 @@ export default function Sidebar({ projects, dispatchProjects, selectedProjectId,
     const createProject: MouseEventHandler<HTMLButtonElement> = (e) => {
         e.preventDefault()
 
-        if(!nameInput.current || !descriptionInput.current || !deadlineInput.current) return // TODO: Show fields with errors
+        if (!nameInput.current || !descriptionInput.current || !deadlineInput.current) return // TODO: Show fields with errors
 
         const projectName = nameInput.current.value
         const projectDescription = descriptionInput.current.value
@@ -59,8 +99,11 @@ export default function Sidebar({ projects, dispatchProjects, selectedProjectId,
             }
         })
 
-        closeDialog()
+        nameInput.current.value = "";
+        descriptionInput.current.value = "";
+        deadlineInput.current.value = "";
 
+        closeDialog()
         setSelectedProjectId(projects.length)
     }
 
@@ -69,16 +112,16 @@ export default function Sidebar({ projects, dispatchProjects, selectedProjectId,
 
     return (
         <>
-            <Modal ref={dialog} targetElement={document.getElementsByTagName("body")[0]}>
-                <button onClick={closeDialog}>X</button>
-                <input type="text" ref={nameInput} placeholder="Project name" />
-                <textarea ref={descriptionInput} placeholder="Project description" />
-                <input type="date" ref={deadlineInput} placeholder="Project deadline" />
-                
-                <button onClick={createProject}>Create</button>
+            <Modal ref={dialog} css={ModalCss} targetElement={document.getElementsByTagName("body")[0]}>
+                <CloseButton onClick={closeDialog}><span className="material-symbols-outlined">close</span></CloseButton>
+                <ModalInput type="text" ref={nameInput} placeholder="Project name" />
+                <ModalTextarea ref={descriptionInput} placeholder="Project description" />
+                <ModalInput type="date" ref={deadlineInput} placeholder="Project deadline" />
+
+                <ModalButton onClick={createProject}>Create</ModalButton>
             </Modal>
             <SidebarContainer>
-                { projects.map(listItem) }
+                {projects.map(listItem)}
 
                 <SidebarItem selected={false} onClick={openDialog}>+ Create project</SidebarItem>
             </SidebarContainer>
