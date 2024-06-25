@@ -7,3 +7,4 @@ export type ProjectsAction =
   | { type: "DELETE_TASK"; projectIndex: number, taskIndex: number, data: Task }
   | { type: "CREATE_PROJECT"; data: Project}
   | { type: "DELETE_PROJECT"; projectIndex: number }
+  | { type: "UPDATE_PROJECT"; projectIndex: number, data: Project}

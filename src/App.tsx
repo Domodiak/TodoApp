@@ -21,6 +21,10 @@ function projectsReducer(state: Project[], action: ProjectsAction): Project[] {
       break
     case "DELETE_PROJECT":
       newState.splice(action.projectIndex, 1)
+      break
+    case "UPDATE_PROJECT":
+      newState[action.projectIndex] = action.data
+      break
   }
 
   return newState
@@ -33,7 +37,7 @@ function App() {
   return (
       <>
         <Sidebar projects={projects} dispatchProjects={dispatchProjects} selectedProjectId={selectedProjectId} setSelectedProjectId={setSelectedProjectId} />
-        <ProjectView project={selectedProjectId !== undefined ? projects[selectedProjectId] : null} projectsDispatch={dispatchProjects} projectId={selectedProjectId} />
+        <ProjectView setSelectedProjectId={setSelectedProjectId} project={selectedProjectId !== undefined ? projects[selectedProjectId] : null} projectsDispatch={dispatchProjects} projectId={selectedProjectId} />
       </>
   )
 }
