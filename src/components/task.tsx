@@ -1,12 +1,9 @@
-import { Dispatch, MouseEventHandler, useState } from "react"
+import { Dispatch, useEffect, useRef, useState } from "react"
 import { ProjectsAction, Task as T_Task } from "../types"
 import styled from "styled-components"
 
 interface TaskTextProps {
     completed: string
-}
-interface DeleteProps {
-    show: boolean
 }
 
 const TaskContainer = styled.li`
@@ -16,6 +13,10 @@ const TaskContainer = styled.li`
     &:hover {
         background: #eee;
     }
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 `
 const TaskText = styled.span<TaskTextProps>`
     margin-left: 1rem;
@@ -28,21 +29,19 @@ const TaskText = styled.span<TaskTextProps>`
     `}
 `
 
-const Delete = styled.button<DeleteProps>`
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 10%;
-
-    ${ props => props.show && `
-        display: flex;
-    `}
+const Actions = styled.div`
+    width: 20%;
+    height: 100%;
 `
 
 export default function Task({ task, projectsDispatch, projectIndex, taskIndex }: { task: T_Task, projectsDispatch: Dispatch<ProjectsAction>, projectIndex: number, taskIndex: number }) {
     const [ isHovered, setIsHovered ] = useState(false)
+    const [ isEditing, setIsEditing ] = useState(false)
+    const editInput = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        if(editInput.current) editInput.current.value = task.text
+    }, [isEditing])
 
     const toggle = () => {
         const newTask: T_Task = JSON.parse(JSON.stringify(task))
@@ -50,13 +49,13 @@ export default function Task({ task, projectsDispatch, projectIndex, taskIndex }
         projectsDispatch({ type: "UPDATE_TASK", projectIndex: projectIndex, taskIndex: taskIndex, data: newTask })
     }
 
-    const onMouseEnter: MouseEventHandler<HTMLLIElement> = () => {
+    const onMouseEnter = () => {
         setIsHovered(true)
     }
-    const onMouseLeave: MouseEventHandler<HTMLLIElement> = () => {
+    const onMouseLeave = () => {
         setIsHovered(false)
     }
-    const deleteTask: MouseEventHandler<HTMLButtonElement> = () => {
+    const deleteTask= () => {
         projectsDispatch({
             type: "DELETE_TASK",
             projectIndex: projectIndex,
@@ -64,7 +63,42 @@ export default function Task({ task, projectsDispatch, projectIndex, taskIndex }
         })
     }
 
+    const startEditing = () => {
+        setIsEditing(true)
+    }
+    const saveChanges = () => {
+        if(!isEditing) return
+        const newTask: T_Task = JSON.parse(JSON.stringify(task))
+        newTask.text = editInput.current!.value
+        projectsDispatch({
+            type: "UPDATE_TASK",
+            projectIndex: projectIndex,
+            taskIndex: taskIndex,
+            data: newTask
+        })
+
+        setIsEditing(false)
+    }
+    const cancelChanges = () => {
+        setIsEditing(false)
+    }
+
     return (
-        <TaskContainer onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}><input type="checkbox" checked={task.completed} onChange={ toggle } /><TaskText completed={ task.completed.toString() }>{ task.text }</TaskText><Delete show={isHovered} onClick={deleteTask}>Delete</Delete></TaskContainer> //TODO: Replace with an icon
+        <TaskContainer onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+            <div>
+                <input type="checkbox" checked={task.completed} onChange={ toggle } />
+                { 
+                isEditing ? <input autoFocus onKeyDown={(e) => { if(e.key === "Enter") { saveChanges() } }} ref={editInput} />
+                : <TaskText completed={ task.completed.toString() }>{ task.text }</TaskText>
+                }
+            </div>
+            { isHovered && 
+            <Actions>
+                { 
+                isEditing ? <><button onClick={saveChanges}>Save</button><button onClick={cancelChanges}>Cancel</button></>// TODO: Replace with an icon
+                : <><button onClick={startEditing}>Edit</button><button onClick={deleteTask}>Delete</button></>
+                }
+            </Actions> }
+        </TaskContainer>
     )
 }
