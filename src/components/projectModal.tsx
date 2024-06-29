@@ -1,7 +1,6 @@
 import styled, { css } from "styled-components"
 import Modal from "./modal"
 import { MouseEventHandler, RefObject } from "react"
-import { Project } from "../types"
 
 const ModalCss = css`
     padding: 2rem;
@@ -55,18 +54,6 @@ const Error = styled.div`
     margin-bottom: 0.5rem;
 `
 
-const getDateString = (date: Date) => {
-    let day = date.getDay().toString()
-    let month = date.getMonth().toString()
-    let year = date.getFullYear().toString()
-
-    let padDay = "0".repeat(2 - day.length) + day
-    let padMonth = "0".repeat(2 - month.length) + month
-    let padYear = "0".repeat(4 - year.length) + year
-    
-    return `${padYear}-${padMonth}-${padDay}`
-}
-
 interface ProjectModalProps {
     dialog: RefObject<HTMLDialogElement>,
     closeDialog: () => void,
@@ -76,24 +63,23 @@ interface ProjectModalProps {
     deadlineError: string | undefined,
     deadlineInput: RefObject<HTMLInputElement>,
     callback: MouseEventHandler<HTMLButtonElement>,
-    initial?: Project,
     buttonLabel: string
 }
 
-const ProjectModal = ({ dialog, closeDialog, nameError, buttonLabel, nameInput, descriptionInput, deadlineError, deadlineInput, callback, initial }: ProjectModalProps) => {
+const ProjectModal = ({ dialog, closeDialog, nameError, buttonLabel, nameInput, descriptionInput, deadlineError, deadlineInput, callback }: ProjectModalProps) => {
     return (
         <Modal ref={dialog} css={ModalCss} targetElement={document.getElementsByTagName("body")[0]}>
             <CloseButton onClick={closeDialog}><span className="material-symbols-outlined">close</span></CloseButton>
             <ModalGroup>
                 {nameError ? <Error>{nameError}</Error> : null}
-                <ModalInput type="text" defaultValue={initial?.name} ref={nameInput} placeholder="Project name" />
+                <ModalInput type="text" ref={nameInput} placeholder="Project name" />
             </ModalGroup>
             <ModalGroup>
-                <ModalTextarea ref={descriptionInput} defaultValue={initial?.description} placeholder="Project description" />
+                <ModalTextarea ref={descriptionInput} placeholder="Project description" />
             </ModalGroup>
             <ModalGroup>
                 {deadlineError ? <Error>{deadlineError}</Error> : null}
-                <ModalInput type="date" defaultValue={initial ? getDateString(new Date(initial!.deadline)) : ""} ref={deadlineInput} placeholder="Project deadline" />
+                <ModalInput type="date" ref={deadlineInput} placeholder="Project deadline" />
             </ModalGroup>
             <ModalGroup>
                 <ModalButton onClick={callback}>{buttonLabel}</ModalButton>

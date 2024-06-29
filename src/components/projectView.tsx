@@ -35,6 +35,19 @@ const Tasks = styled.ul`
     margin: 1rem 0;
 `
 
+const getDateString = (date: Date) => {
+    let day = date.getDate().toString()
+    let month = (date.getMonth()+1).toString()
+    let year = date.getFullYear().toString()
+
+
+    let padDay = "0".repeat(2 - day.length) + day
+    let padMonth = "0".repeat(2 - month.length) + month
+    let padYear = "0".repeat(4 - year.length) + year
+    
+    return `${padYear}-${padMonth}-${padDay}`
+}
+
 export default function ProjectView({ setSelectedProjectId, projectsDispatch, project, projectId }: { projectsDispatch: Dispatch<ProjectsAction>, setSelectedProjectId: Dispatch<SetStateAction<number | undefined>>, project: Project | null, projectId: number | undefined }) {
     if (!project) {
         return (
@@ -52,7 +65,12 @@ export default function ProjectView({ setSelectedProjectId, projectsDispatch, pr
     const [ deadlineError, setDeadlineError ] = useState<string>()
 
     const openDialog = () => {
+        if(!nameInput.current || !descriptionInput.current || !deadlineInput.current) return console.error("Modal input ref not set")
+
         dialog.current && dialog.current.showModal()
+        nameInput.current.value = project.name // makes modal content match project data every time it opens
+        deadlineInput.current.value = getDateString(new Date(project.deadline))
+        descriptionInput.current.value = project.description
     }
     const closeDialog = () => {
         dialog.current && dialog.current.close()
@@ -95,14 +113,10 @@ export default function ProjectView({ setSelectedProjectId, projectsDispatch, pr
                 name: projectName,
                 description: projectDescription,
                 deadline: projectDeadline,
-                tasks: []
+                tasks: project.tasks
             },
             projectIndex: projectId!
         })
-
-        nameInput.current!.value = "";
-        descriptionInput.current!.value = "";
-        deadlineInput.current!.value = "";
 
         setNameError("")
         setDeadlineError("")
@@ -112,7 +126,7 @@ export default function ProjectView({ setSelectedProjectId, projectsDispatch, pr
 
     return (
         <>
-            <ProjectModal buttonLabel="Update" initial={project} dialog={dialog} closeDialog={closeDialog} nameError={nameError} nameInput={nameInput} descriptionInput={descriptionInput} deadlineError={deadlineError} deadlineInput={deadlineInput} callback={editProject} />
+            <ProjectModal buttonLabel="Update" dialog={dialog} closeDialog={closeDialog} nameError={nameError} nameInput={nameInput} descriptionInput={descriptionInput} deadlineError={deadlineError} deadlineInput={deadlineInput} callback={editProject} />
             <ProjectContainer>
                 <ProjectTitle>{project.name}</ProjectTitle>
                 <ProjectDeadline>{new Date(project.deadline).toDateString()}</ProjectDeadline>
